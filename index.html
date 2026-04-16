@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fieldstone Title — Disbursement Dashboard</title>
+<style>
+  :root {
+    --slate: #466079;
+    --slate-dark: #344a5c;
+    --slate-light: #5a7a95;
+    --slate-bg: #eef2f5;
+    --pink: #e84393;
+    --pink-light: #fde8f2;
+    --pink-border: #f0a0c8;
+    --amber: #e67e22;
+    --amber-light: #fef3e2;
+    --amber-border: #f0c070;
+    --white: #ffffff;
+    --gray-50: #f8f9fa;
+    --gray-100: #f1f3f5;
+    --gray-200: #e2e6ea;
+    --gray-400: #ced4da;
+    --gray-600: #6c757d;
+    --gray-800: #343a40;
+    --radius: 10px;
+    --shadow: 0 2px 12px rgba(70,96,121,.12);
+    --shadow-lg: 0 8px 30px rgba(70,96,121,.18);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: var(--slate-bg); color: var(--gray-800); }
+
+  /* ── Header ───────────────────────────────────── */
+  header {
+    background: linear-gradient(135deg, var(--slate) 0%, var(--slate-dark) 100%);
+    color: var(--white);
+    padding: 20px 32px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    box-shadow: 0 4px 20px rgba(52,74,92,.25);
+  }
+  .logo-mark {
+    width: 48px; height: 48px;
+    background: var(--white);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 22px; color: var(--slate);
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,.15);
+  }
+  header h1 { font-size: 22px; font-weight: 700; letter-spacing: -.3px; }
+  header p { font-size: 13px; opacity: .8; margin-top: 2px; }
+  .header-right { margin-left: auto; text-align: right; font-size: 13px; opacity: .85; }
+
+  /* ── Container ────────────────────────────────── */
+  .container { max-width: 1200px; margin: 0 auto; padding: 24px 20px 40px; }
+
+  /* ── Metric Cards ─────────────────────────────── */
+  .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+  .card {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    box-shadow: var(--shadow);
+    border-top: 4px solid var(--slate);
+    transition: transform .15s, box-shadow .15s;
+  }
+  .card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+  .card .label { font-size: 12px; text-transform: uppercase; letter-spacing: .8px; color: var(--gray-600); font-weight: 600; }
+  .card .value { font-size: 32px; font-weight: 800; color: var(--slate); margin-top: 4px; }
+  .card .sub { font-size: 12px; color: var(--gray-600); margin-top: 4px; }
+  .card.pink  { border-top-color: var(--pink); }
+  .card.pink .value { color: var(--pink); }
+  .card.amber { border-top-color: var(--amber); }
+
+  /* ── Toolbar ──────────────────────────────────── */
+  .toolbar {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+    margin-bottom: 20px;
+  }
+  .filter-btn {
+    padding: 8px 20px;
+    border-radius: 20px;
+    border: 2px solid var(--gray-400);
+    background: var(--white);
+    font-size: 13px; font-weight: 600;
+    cursor: pointer;
+    transition: all .15s;
+    color: var(--gray-600);
+  }
+  .filter-btn:hover { border-color: var(--slate); color: var(--slate); }
+  .filter-btn.active { background: var(--slate); color: var(--white); border-color: var(--slate); }
+  .filter-btn.active-pink { background: var(--pink); color: var(--white); border-color: var(--pink); }
+  .filter-btn.active-amber { background: var(--amber); color: var(--white); border-color: var(--amber); }
+  .month-nav {
+    margin-left: auto; display: flex; align-items: center; gap: 8px;
+  }
+  .month-nav button {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    border: 2px solid var(--gray-400);
+    background: var(--white);
+    cursor: pointer;
+    font-size: 16px; font-weight: 700;
+    color: var(--gray-600);
+    display: flex; align-items: center; justify-content: center;
+    transition: all .15s;
+  }
+  .month-nav button:hover { border-color: var(--slate); color: var(--slate); }
+  .month-label { font-size: 17px; font-weight: 700; color: var(--slate); min-width: 160px; text-align: center; }
+
+  /* ── Calendar ─────────────────────────────────── */
+  .cal-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 2px;
+    background: var(--white);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .cal-head {
+    background: var(--slate);
+    color: var(--white);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .8px;
+    padding: 10px 8px;
+    text-align: center;
+  }
+  .cal-cell {
+    min-height: 110px;
+    background: var(--white);
+    padding: 6px 8px;
+    border: 1px solid var(--gray-200);
+    cursor: pointer;
+    transition: background .12s;
+    position: relative;
+  }
+  .cal-cell:hover { background: var(--gray-50); }
+  .cal-cell.today { background: #e8f0fe; }
+  .cal-cell.today .day-num { background: var(--slate); color: var(--white); }
+  .cal-cell.empty { background: var(--gray-100); cursor: default; }
+  .cal-cell.selected { outline: 3px solid var(--slate); outline-offset: -3px; z-index: 1; }
+  .day-num {
+    display: inline-block;
+    width: 26px; height: 26px;
+    line-height: 26px;
+    text-align: center;
+    font-size: 13px; font-weight: 700;
+    color: var(--gray-800);
+    border-radius: 50%;
+    margin-bottom: 4px;
+  }
+  .cal-cell.past .day-num { color: var(--gray-400); }
+
+  /* ── Pills ────────────────────────────────────── */
+  .pill {
+    display: block;
+    font-size: 10.5px;
+    font-weight: 600;
+    padding: 3px 7px;
+    border-radius: 6px;
+    margin-bottom: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.4;
+  }
+  .pill.melissa { background: var(--pink-light); color: #b5245a; border: 1px solid var(--pink-border); }
+  .pill.heather { background: var(--amber-light); color: #9a5c15; border: 1px solid var(--amber-border); }
+
+  /* ── Detail Panel ─────────────────────────────── */
+  .detail-panel {
+    margin-top: 24px;
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    display: none;
+  }
+  .detail-panel.show { display: block; }
+  .detail-header {
+    background: var(--slate);
+    color: var(--white);
+    padding: 14px 22px;
+    font-size: 15px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .detail-close {
+    background: none; border: none; color: var(--white);
+    font-size: 22px; cursor: pointer; opacity: .8;
+    line-height: 1;
+  }
+  .detail-close:hover { opacity: 1; }
+  .detail-table { width: 100%; border-collapse: collapse; }
+  .detail-table th {
+    background: var(--gray-100);
+    padding: 10px 16px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .7px;
+    color: var(--gray-600);
+    text-align: left;
+    font-weight: 700;
+    border-bottom: 2px solid var(--gray-200);
+  }
+  .detail-table td {
+    padding: 12px 16px;
+    font-size: 13px;
+    border-bottom: 1px solid var(--gray-200);
+  }
+  .detail-table tr:last-child td { border-bottom: none; }
+  .detail-table tr:hover td { background: var(--gray-50); }
+  .assignee-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 11.5px;
+    font-weight: 700;
+  }
+  .assignee-badge.melissa { background: var(--pink-light); color: #b5245a; }
+  .assignee-badge.heather { background: var(--amber-light); color: #9a5c15; }
+
+  .no-data {
+    padding: 40px;
+    text-align: center;
+    color: var(--gray-600);
+    font-size: 14px;
+  }
+
+  /* ── Footer ───────────────────────────────────── */
+  footer {
+    text-align: center;
+    padding: 20px;
+    font-size: 11px;
+    color: var(--gray-600);
+  }
+
+  @media (max-width: 700px) {
+    .metrics { grid-template-columns: repeat(2, 1fr); }
+    .cal-cell { min-height: 80px; }
+    .pill { font-size: 9px; padding: 2px 5px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-mark">FT</div>
+  <div>
+    <h1>Fieldstone Title</h1>
+    <p>Disbursement Dashboard</p>
+  </div>
+  <div class="header-right">
+    Generated: April 16, 2026<br>
+    Source: Disbursement_Calendar_2026-04-16.csv
+  </div>
+</header>
+
+<div class="container">
+  <!-- Metric Cards -->
+  <div class="metrics" id="metrics"></div>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <button class="filter-btn active" data-filter="all" onclick="setFilter('all',this)">All</button>
+    <button class="filter-btn" data-filter="melissa" onclick="setFilter('melissa',this)">Melissa Foglia</button>
+    <button class="filter-btn" data-filter="heather" onclick="setFilter('heather',this)">Heather Barron</button>
+    <div class="month-nav">
+      <button onclick="changeMonth(-1)" title="Previous month">&larr;</button>
+      <span class="month-label" id="monthLabel"></span>
+      <button onclick="changeMonth(1)" title="Next month">&rarr;</button>
+    </div>
+  </div>
+
+  <!-- Calendar -->
+  <div class="cal-grid" id="calGrid"></div>
+
+  <!-- Detail Panel -->
+  <div class="detail-panel" id="detailPanel">
+    <div class="detail-header">
+      <span id="detailTitle">Disbursements</span>
+      <button class="detail-close" onclick="closeDetail()">&times;</button>
+    </div>
+    <div id="detailBody"></div>
+  </div>
+</div>
+
+<footer>Fieldstone Title LLC &mdash; Disbursement Dashboard &mdash; Data as of April 16, 2026</footer>
+
+<script>
+// ── Data ──
+const DATA = [
+  { date:"05/07/2026", order:"2026-11", closing:"05/07/2026", assignee:"Melissa Foglia", address:"23560 Wellington Avenue", borrower:"Gurin", borrowerFull:"Gurin, Stewart" },
+  { date:"03/18/2026", order:"2026-69", closing:"03/17/2026", assignee:"Heather Barron", address:"14730 Seven Mile West", borrower:"Yono", borrowerFull:"Yono" },
+  { date:"04/16/2026", order:"2026-81", closing:"04/11/2026", assignee:"Melissa Foglia", address:"9919 Spruce Street", borrower:"Kolenda", borrowerFull:"Kolenda" },
+  { date:"04/16/2026", order:"2026-104", closing:"04/11/2026", assignee:"Melissa Foglia", address:"307 Buckhorn Road", borrower:"Boyland", borrowerFull:"Boyland" },
+  { date:"04/13/2026", order:"2026-116", closing:"04/07/2026", assignee:"Melissa Foglia", address:"9971 Pine Grove Court", borrower:"Spann", borrowerFull:"Spann" },
+  { date:"04/17/2026", order:"2026-129", closing:"04/13/2026", assignee:"Heather Barron", address:"2380 Bony Lake Road", borrower:"Abell", borrowerFull:"Abell, Abell" },
+  { date:"04/17/2026", order:"2026-158", closing:"04/13/2026", assignee:"Heather Barron", address:"8 Bowser Road", borrower:"Irving", borrowerFull:"Irving" },
+  { date:"04/14/2026", order:"2026-179", closing:"04/09/2026", assignee:"Heather Barron", address:"46161 Hollowoode Lane", borrower:"Bell", borrowerFull:"Bell" },
+  { date:"04/22/2026", order:"2026-186", closing:"04/17/2026", assignee:"Heather Barron", address:"640 Miriah Drive", borrower:"Ailiff", borrowerFull:"Ailiff, Ailiff" },
+  { date:"04/27/2026", order:"2026-218", closing:"04/22/2026", assignee:"Melissa Foglia", address:"3 John Paul Jones Drive", borrower:"Douglas", borrowerFull:"Douglas" },
+  { date:"04/15/2026", order:"2026-225", closing:"04/10/2026", assignee:"Heather Barron", address:"337 Solar Drive", borrower:"Sparks", borrowerFull:"Sparks" },
+  { date:"04/22/2026", order:"2026-239", closing:"04/17/2026", assignee:"Heather Barron", address:"107 Theresa Street", borrower:"Hairston", borrowerFull:"Hairston" },
+  { date:"04/22/2026", order:"2026-241", closing:"04/17/2026", assignee:"Melissa Foglia", address:"633 Raab Street", borrower:"Benitez", borrowerFull:"Benitez" },
+  { date:"04/14/2026", order:"2026-267", closing:"04/14/2026", assignee:"Melissa Foglia", address:"8331 Stanley Drive", borrower:"Tricoli", borrowerFull:"Tricoli" }
+];
+
+const TODAY = new Date(2026, 3, 16); // April 16, 2026
+const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+const WEEKDAYS = ["Monday","Tuesday","Wednesday","Thursday","Friday"];
+
+let currentFilter = "all";
+let viewYear = 2026, viewMonth = 3; // April 2026
+let selectedDate = null;
+
+// ── Helpers ──
+function parseDate(s) {
+  const [m,d,y] = s.split("/").map(Number);
+  return new Date(y, m-1, d);
+}
+function fmtDate(d) {
+  return String(d.getMonth()+1).padStart(2,"0")+"/"+String(d.getDate()).padStart(2,"0")+"/"+d.getFullYear();
+}
+function fmtDateLong(d) {
+  return MONTHS[d.getMonth()]+" "+d.getDate()+", "+d.getFullYear();
+}
+function sameDay(a,b) { return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate(); }
+function assigneeClass(a) { return a.includes("Melissa") ? "melissa" : "heather"; }
+
+function filtered() {
+  if (currentFilter === "all") return DATA;
+  if (currentFilter === "melissa") return DATA.filter(r => r.assignee.includes("Melissa"));
+  return DATA.filter(r => r.assignee.includes("Heather"));
+}
+
+// ── Metrics ──
+function renderMetrics() {
+  const d = filtered();
+  const total = d.length;
+  const upcoming = d.filter(r => parseDate(r.date) >= TODAY).length;
+  const melissaCount = d.filter(r => r.assignee.includes("Melissa")).length;
+
+  // Next disbursement: earliest date >= today
+  const futureDates = d.filter(r => parseDate(r.date) >= TODAY).map(r => parseDate(r.date)).sort((a,b) => a-b);
+  const nextDisb = futureDates.length ? fmtDateLong(futureDates[0]) : "None";
+  const nextDisbSub = futureDates.length ? futureDates.filter(f => sameDay(f, futureDates[0])).length + " file(s)" : "";
+
+  document.getElementById("metrics").innerHTML = `
+    <div class="card">
+      <div class="label">Assigned Files</div>
+      <div class="value">${total}</div>
+      <div class="sub">With assignee &amp; date</div>
+    </div>
+    <div class="card">
+      <div class="label">Upcoming</div>
+      <div class="value">${upcoming}</div>
+      <div class="sub">On or after today</div>
+    </div>
+    <div class="card pink">
+      <div class="label">Melissa Foglia</div>
+      <div class="value">${melissaCount}</div>
+      <div class="sub">Assigned files</div>
+    </div>
+    <div class="card">
+      <div class="label">Next Disbursement</div>
+      <div class="value" style="font-size:18px; margin-top:8px;">${nextDisb}</div>
+      <div class="sub">${nextDisbSub}</div>
+    </div>
+  `;
+}
+
+// ── Calendar ──
+function renderCalendar() {
+  const d = filtered();
+  const g = document.getElementById("calGrid");
+  document.getElementById("monthLabel").textContent = MONTHS[viewMonth] + " " + viewYear;
+
+  // Build map: dateStr → items
+  const map = {};
+  d.forEach(r => {
+    const dt = parseDate(r.date);
+    if (dt.getMonth() === viewMonth && dt.getFullYear() === viewYear) {
+      const key = r.date;
+      if (!map[key]) map[key] = [];
+      map[key].push(r);
+    }
+  });
+
+  let html = WEEKDAYS.map(w => `<div class="cal-head">${w.slice(0,3)}</div>`).join("");
+
+  // First day of month
+  const first = new Date(viewYear, viewMonth, 1);
+  let dow = first.getDay(); // 0=Sun
+  // Convert to Mon-based: Mon=0, Tue=1 ... Fri=4, Sat=5, Sun=6
+  let startOffset = (dow === 0) ? 6 : dow - 1;
+  // If startOffset > 4 (Sat=5 or Sun=6), we skip to Monday
+  if (startOffset > 4) startOffset = startOffset === 5 ? 0 : 0; // If 1st is Sat, first weekday cell is Mon (day 3 if Sat, day 2 if Sun)
+
+  // Actually let me recalculate properly. We only show weekdays.
+  const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+
+  // Determine day-of-week for day 1 (0=Sun, 1=Mon...6=Sat)
+  const dow1 = first.getDay();
+  // Mon-based index: Mon=0..Sun=6
+  const monBased = dow1 === 0 ? 6 : dow1 - 1;
+  // Blank cells before first weekday
+  const blanks = monBased > 4 ? 0 : monBased;
+  // If the month starts on Sat or Sun, first Mon is day (8-dow1) or similar
+  // Actually easier: iterate every day, and only render weekday cells
+  for (let i = 0; i < blanks; i++) {
+    html += `<div class="cal-cell empty"></div>`;
+  }
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    const dt = new Date(viewYear, viewMonth, day);
+    const dayOfWeek = dt.getDay();
+    if (dayOfWeek === 0 || dayOfWeek === 6) continue; // skip weekends
+
+    const dateStr = fmtDate(dt);
+    const items = map[dateStr] || [];
+    const isToday = sameDay(dt, TODAY);
+    const isPast = dt < TODAY && !isToday;
+    const isSelected = selectedDate && sameDay(dt, selectedDate);
+
+    let cls = "cal-cell";
+    if (isToday) cls += " today";
+    if (isPast) cls += " past";
+    if (isSelected) cls += " selected";
+    if (items.length === 0) cls += "";
+
+    let pillsHtml = items.map(it => {
+      const c = assigneeClass(it.assignee);
+      const shortAddr = it.address.length > 22 ? it.address.slice(0,20) + "…" : it.address;
+      return `<div class="pill ${c}" title="${it.order} | ${it.borrower} | ${it.address}">${it.order} · ${it.borrower} · ${shortAddr}</div>`;
+    }).join("");
+
+    html += `<div class="${cls}" onclick="selectDate(${viewYear},${viewMonth},${day})">
+      <div class="day-num">${day}</div>
+      ${pillsHtml}
+    </div>`;
+  }
+
+  g.innerHTML = html;
+}
+
+// ── Detail Panel ──
+function selectDate(y, m, day) {
+  const dt = new Date(y, m, day);
+  selectedDate = dt;
+  const dateStr = fmtDate(dt);
+  const d = filtered().filter(r => r.date === dateStr);
+
+  const panel = document.getElementById("detailPanel");
+  document.getElementById("detailTitle").textContent = "Disbursements — " + fmtDateLong(dt);
+
+  if (d.length === 0) {
+    document.getElementById("detailBody").innerHTML = `<div class="no-data">No assigned disbursements on this date.</div>`;
+  } else {
+    let rows = d.map(r => {
+      const c = assigneeClass(r.assignee);
+      return `<tr>
+        <td><strong>${r.order}</strong></td>
+        <td>${r.borrowerFull}</td>
+        <td>${r.address}</td>
+        <td>${r.closing}</td>
+        <td><span class="assignee-badge ${c}">${r.assignee}</span></td>
+      </tr>`;
+    }).join("");
+    document.getElementById("detailBody").innerHTML = `
+      <table class="detail-table">
+        <thead><tr><th>Order #</th><th>Borrower</th><th>Address</th><th>Closing Date</th><th>Assignee</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+  }
+  panel.classList.add("show");
+  renderCalendar();
+  panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+
+function closeDetail() {
+  selectedDate = null;
+  document.getElementById("detailPanel").classList.remove("show");
+  renderCalendar();
+}
+
+// ── Filter ──
+function setFilter(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll(".filter-btn").forEach(b => b.className = "filter-btn");
+  if (f === "melissa") btn.className = "filter-btn active-pink";
+  else if (f === "heather") btn.className = "filter-btn active-amber";
+  else btn.className = "filter-btn active";
+  selectedDate = null;
+  document.getElementById("detailPanel").classList.remove("show");
+  renderMetrics();
+  renderCalendar();
+}
+
+// ── Month Nav ──
+function changeMonth(dir) {
+  viewMonth += dir;
+  if (viewMonth > 11) { viewMonth = 0; viewYear++; }
+  if (viewMonth < 0) { viewMonth = 11; viewYear--; }
+  selectedDate = null;
+  document.getElementById("detailPanel").classList.remove("show");
+  renderCalendar();
+}
+
+// ── Init ──
+renderMetrics();
+renderCalendar();
+</script>
+</body>
+</html>
