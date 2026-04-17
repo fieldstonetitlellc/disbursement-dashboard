@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Disbursement Dashboard</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f4f6f8; color: #1a2433; }
+  .header { background: #466079; color: #fff; padding: 18px 32px; display: flex; align-items: center; gap: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.18); }
+  .header-logo { display: flex; align-items: center; }
+  .header-title { font-size: 1.3rem; font-weight: 700; letter-spacing: 0.02em; }
+  .header-subtitle { font-size: 0.82rem; opacity: 0.78; margin-top: 2px; }
+  .header-date { margin-left: auto; font-size: 0.82rem; opacity: 0.78; }
+  .main { max-width: 1200px; margin: 0 auto; padding: 28px 24px; }
+  .metrics { display: flex; gap: 16px; margin-bottom: 28px; flex-wrap: wrap; }
+  .metric-card { background: #fff; border-radius: 10px; padding: 18px 24px; flex: 1; min-width: 180px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); border-top: 3px solid #466079; }
+  .metric-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; color: #6b7a8d; margin-bottom: 6px; }
+  .metric-value { font-size: 2rem; font-weight: 700; color: #466079; line-height: 1; }
+  .metric-sub { font-size: 0.78rem; color: #8a95a3; margin-top: 4px; }
+  .metric-card.next { border-top-color: #466079; }
+  .controls { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+  .filter-btn { padding: 7px 18px; border-radius: 20px; border: 2px solid transparent; cursor: pointer; font-size: 0.84rem; font-weight: 600; transition: all 0.15s; }
+  .filter-btn.all { background: #e8edf2; color: #466079; border-color: #c5ced8; }
+  .filter-btn.all.active, .filter-btn.all:hover { background: #466079; color: #fff; border-color: #466079; }
+  .filter-btn.melissa-btn { background: #FBEAF0; color: #72243E; border-color: #F4C0D1; }
+  .filter-btn.melissa-btn.active, .filter-btn.melissa-btn:hover { background: #4B1528; color: #F4C0D1; border-color: #4B1528; }
+  .filter-btn.heather-btn { background: #FAEEDA; color: #633806; border-color: #FAC775; }
+  .filter-btn.heather-btn.active, .filter-btn.heather-btn:hover { background: #412402; color: #FAC775; border-color: #412402; }
+  .search-bar { margin-left: auto; padding: 7px 14px; border: 1.5px solid #c5ced8; border-radius: 20px; font-size: 0.84rem; outline: none; width: 240px; }
+  .search-bar:focus { border-color: #466079; }
+  .calendar-wrap { background: #fff; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); overflow: hidden; margin-bottom: 24px; }
+  .calendar-header-row { display: grid; grid-template-columns: repeat(5, 1fr); background: #466079; }
+  .cal-col-head { text-align: center; padding: 10px 4px; color: #fff; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; }
+  .calendar-grid { display: grid; grid-template-columns: repeat(5, 1fr); }
+  .cal-day { border: 1px solid #e6eaf0; min-height: 110px; padding: 8px 6px; cursor: pointer; transition: background 0.12s; vertical-align: top; }
+  .cal-day:hover { background: #f0f4f8; }
+  .cal-day.empty { background: #f9fafb; cursor: default; }
+  .cal-day.today { border: 2.5px solid #466079; background: #eef3f8; }
+  .cal-day.next-upcoming { border: 2px solid #F4C0D1; background: #fef8fb; }
+  .cal-day.selected { background: #e8edf2; }
+  .day-num { font-size: 0.8rem; font-weight: 700; color: #8a95a3; margin-bottom: 5px; }
+  .cal-day.today .day-num { color: #466079; }
+  .pill { display: block; border-radius: 6px; padding: 4px 7px; font-size: 0.72rem; line-height: 1.35; margin-bottom: 4px; border: 1px solid; word-break: break-word; }
+  .pill.melissa { background: #FBEAF0; color: #72243E; border-color: #F4C0D1; }
+  .pill.heather { background: #FAEEDA; color: #633806; border-color: #FAC775; }
+  .pill.other { background: #e8edf2; color: #3a4a5c; border-color: #c5ced8; }
+  .pill .pill-order { font-weight: 700; }
+  .detail-section { background: #fff; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); overflow: hidden; }
+  .detail-header { padding: 14px 20px; background: #466079; color: #fff; font-size: 0.95rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+  .detail-empty { padding: 24px 20px; color: #8a95a3; font-size: 0.88rem; text-align: center; }
+  table { width: 100%; border-collapse: collapse; }
+  th { background: #f0f4f8; color: #466079; font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.05em; padding: 10px 14px; text-align: left; font-weight: 700; }
+  td { padding: 10px 14px; font-size: 0.84rem; border-bottom: 1px solid #e6eaf0; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #f7f9fb; }
+  .assignee-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.75rem; font-weight: 600; }
+  .assignee-badge.melissa { background: #FBEAF0; color: #72243E; border: 1px solid #F4C0D1; }
+  .assignee-badge.heather { background: #FAEEDA; color: #633806; border: 1px solid #FAC775; }
+  .assignee-badge.other { background: #e8edf2; color: #3a4a5c; border: 1px solid #c5ced8; }
+  .today-label { display: inline-block; font-size: 0.68rem; background: #466079; color: #fff; border-radius: 4px; padding: 1px 5px; margin-left: 6px; vertical-align: middle; }
+</style>
+</head>
+<body>
+<header class="header">
+  <div class="header-logo">
+    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 555.652 162.783" style="height:36px;width:auto;background:#fff;border-radius:5px;padding:4px 8px;">
+      <defs>
+        <clipPath id="cp1"><path transform="matrix(1,0,0,-1,0,162.783)" d="M0 162.783H555.652V0H0Z"/></clipPath>
+        <path id="f1" d="M.13798523-.00390625C.21199036-.00390625 .23199463 .017059327 .23199463 .047027589 .23199463 .06700134 .20698548 .08796692 .20698548 .1618805V.25276185C.20698548 .27972413 .21398926 .28770448 .24699402 .28770448H.2579956C.38398744 .28770448 .37599183 .2687378 .4059906 .2687378 .43399049 .2687378 .44699098 .28970338 .44699098 .33770753 .44699098 .38571168 .43399049 .40670777 .4059906 .40670777 .3809967 .40670777 .37098695 .38671876 .2539978 .38671876H.24699402C.21499634 .38671876 .20698548 .39570619 .20698548 .4237213V.5387268C.20698548 .5727234 .21899414 .5787201 .27398683 .5787201 .36898805 .5787201 .4019928 .5597229 .44999696 .5297241 .46199037 .5217285 .47200013 .51771548 .48199464 .51771548 .5059967 .51771548 .522995 .5357208 .522995 .5647278 .522995 .61172488 .4869995 .6777344 .44299317 .6777344 .4119873 .6778259 .3999939 .66981509 .18099976 .66981509 .15499878 .66981509 .12799073 .6738281 .102996829 .6738281 .070999149 .6738281 .051986696 .6528168 .051986696 .62280276 .051986696 .60279849 .066986087 .5817871 .066986087 .50775149V.1618805C.066986087 .08796692 .051986696 .06700134 .051986696 .047027589 .051986696 .017059327 .07199097-.00390625 .13798523-.00390625Z"/>
+        <path id="f2" d="M.11999512 .57250979C.1789856 .57250979 .21598816 .60350039 .21598816 .6505127 .21598816 .69750979 .1789856 .7285156 .11999512 .7285156 .05999756 .7285156 .022994996 .69750979 .022994996 .6505127 .022994996 .60350039 .06098938 .57250979 .11999512 .57250979M.1269989-.00390625C.19099427-.00390625 .21099854 .017059327 .21099854 .047042848 .21099854 .0670166 .19599915 .08799744 .19599915 .16192627V.48060609C.19599915 .5015869 .18099976 .5175781 .16099549 .5175781 .15299988 .5175781 .1309967 .51556399 .09899902 .50756838 .05999756 .49856568 .033996583 .48857118 .033996583 .4535675 .033996583 .4125824 .057998659 .40559388 .057998659 .3316803V.16192627C.057998659 .08799744 .035995485 .0670166 .035995485 .047042848 .035995485 .017059327 .054992677-.00390625 .1269989-.00390625Z"/>
+        <path id="f3" d="M.2769928-.009765625C.35299684-.009765625 .4149933 .018234253 .45199586 .068222049 .46099855 .081222537 .46598817 .0952301 .46598817 .10823059 .46598817 .1162262 .46299745 .1242218 .45799256 .12922669 .45199586 .13421631 .44499208 .13621521 .43598939 .13621521 .42599488 .13621521 .41600038 .13421631 .40098573 .1262207 .36698915 .10823059 .33999635 .10122681 .3019867 .10122681 .22499085 .10122681 .16999817 .1552124 .16999817 .23118592 .16999817 .23718262 .17199707 .23918152 .1769867 .23918152H.44400025C.47698976 .23918152 .49299623 .26019288 .49299623 .30319215 .49299623 .43356324 .4039917 .5175781 .2649994 .5175781 .11898804 .5175781 .024993897 .41467286 .024993897 .2571869 .024993897 .096221927 .12599182-.009765625 .2769928-.009765625M.1769867 .3251953C.17199707 .3251953 .16999817 .32817079 .16999817 .33314515 .16999817 .38882447 .20899964 .43156434 .2639923 .43156434 .31599427 .43156434 .34799195 .39378358 .34799195 .33314515 .34799195 .32717896 .34599305 .3251953 .34098817 .3251953H.1769867Z"/>
+        <path id="f4" d="M.18899536 .16212464V.7032318C.18899536 .7242279 .17399597 .7402344 .1539917 .7402344 .147995 .7402344 .12599182 .7382355 .09399414 .7302246 .054992677 .7212219 .026992798 .7112274 .026992798 .6772156 .026992798 .6362152 .051986696 .62820437 .051986696 .5541992V.16212464C.051986696 .08810425 .037994386 .067092899 .037994386 .047088624 .037994386 .017089844 .056991579-.00390625 .12098694-.00390625 .18499756-.00390625 .20399475 .017089844 .20399475 .047088624 .20399475 .067092899 .18899536 .08810425 .18899536 .16212464Z"/>
+        <path id="f5" d="M.23599243-.009765625C.33198548-.009765625 .375 .06123352 .3889923 .06123352 .3929901 .06123352 .394989 .05921936 .39898683 .036224367 .4039917 .0152282719 .4139862-.009765625 .43399049-.009765625 .44499208-.009765625 .45399476-.0077667238 .4850006 .00022888184 .5279999 .01222229 .55400088 .024230957 .55400088 .055221559 .55400088 .08421326 .5169983 .11715698 .5169983 .18902588V.70310977C.5169983 .7241821 .5019989 .7402344 .48199464 .7402344 .47599793 .7402344 .45399476 .7382202 .42099 .7301941 .3829956 .72117617 .35499574 .71113589 .35499574 .6770325 .35499574 .63597109 .37998963 .628952 .37998963 .553772V.5116577C.37998963 .50364688 .37799073 .4996338 .36999513 .4996338 .36099244 .49957276 .32798768 .5175781 .27598573 .5175781 .1269989 .5175781 .024993897 .4056244 .024993897 .2399292 .024993897 .09320068 .11299133-.009765625 .23599243-.009765625M.269989 .07623291C.20698548 .07623291 .17098999 .13311768 .17098999 .24990845 .17098999 .37167359 .21199036 .43156434 .2869873 .43156434 .34498597 .43156434 .37998963 .4056244 .37998963 .37268067V.21496582C.37998963 .12913513 .33099366 .07623291 .269989 .07623291Z"/>
+        <path id="f6" d="M.22599793-.009765625C.34098817-.009765625 .41999818 .05722046 .41999818 .15507508 .41999818 .24491883 .375 .2878418 .25299073 .31878663 .16699219 .34074403 .14498902 .35472108 .14498902 .3866577 .14498902 .41960145 .17399597 .44056703 .21899414 .44056703 .2649994 .44056703 .2849884 .41960145 .30999757 .39564515 .33099366 .37368775 .34399415 .36669923 .36499024 .36669923 .38598634 .36669923 .3999939 .38067628 .3999939 .40364076 .3999939 .42181397 .3909912 .45178224 .37799073 .47375489 .3639984 .49972535 .34799195 .51171877 .33198548 .51171877 .31999208 .51171877 .30999757 .50572207 .2979889 .50572207 .2829895 .50556948 .25698854 .5175781 .21998596 .5175781 .10998535 .5175781 .0289917 .4495697 .0289917 .3557129 .0289917 .27285768 .07798767 .22395325 .19299317 .19500733 .2849884 .17103577 .3039856 .15905762 .3039856 .12911988 .3039856 .09118652 .272995 .066223148 .22698975 .066223148 .1619873 .066223148 .13598633 .09617615 .11199951 .12013245 .09199524 .14309693 .07798767 .15008545 .056991579 .15008545 .036987306 .15008545 .022994996 .1361084 .022994996 .11314392 .022994996 .09516907 .03199768 .06422424 .04399109 .041229249 .056991579 .018234253 .07299805 .0042266848 .08898926 .0042266848 .100997928 .0042266848 .11099243 .010223389 .12199402 .010223389 .13699341 .010223389 .16999817-.009765625 .22599793-.009765625Z"/>
+        <path id="f7" d="M.23899842-.009765625C.2869873-.009765625 .32899476 .009231567 .35299684 .035232545 .3619995 .04623413 .36698915 .05722046 .36698915 .069229129 .36698915 .08522034 .35499574 .09719849 .33898927 .09719849 .32798768 .09719849 .31999208 .09420776 .31199647 .08921814 .29699708 .081222537 .28599549 .07623291 .2709961 .07623291 .23999024 .07623291 .22299195 .10119629 .22299195 .1431427V.3878479C.22299195 .41381837 .23199463 .4217987 .24899292 .4217987H.30899049C.33799745 .4217987 .34498597 .4367981 .34498597 .46479798 .34498597 .49580384 .33599855 .5078125 .30899049 .5078125H.2539978C.23199463 .5078125 .22299195 .5158081 .22299195 .5418091V.57881167C.22299195 .6108093 .20498657 .6238098 .1789856 .6238098 .12399292 .6238098 .12998963 .5617981 .052993776 .5118103 .020996094 .49180604 .008987427 .48181153 .008987427 .46180726 .008987427 .43580628 .01499939 .4217987 .041992189 .4217987H.054992677C.07699585 .4217987 .085998538 .41381837 .085998538 .3878479V.1471405C.085998538 .034225465 .14498902-.009765625 .23899842-.009765625Z"/>
+        <path id="f8" d="M.27999879 .5175781C.12799073 .5175781 .023986817 .4086151 .023986817 .253891 .023986817 .09718323 .1269989-.009765625 .27999879-.009765625 .43199159-.009765625 .5349884 .09819031 .5349884 .25489808 .5349884 .41160584 .43199159 .5175781 .27999879 .5175781M.27999879 .07623291C.20399475 .07623291 .16999817 .1381073 .16999817 .24990845 .16999817 .36569215 .20498657 .43156434 .27999879 .43156434 .35499574 .43156434 .3899994 .37068177 .3899994 .25889588 .3899994 .14309693 .35398866 .07623291 .27999879 .07623291Z"/>
+        <path id="f9" d="M.12599182-.00390625C.19898987-.00390625 .21798706 .017059327 .21798706 .047027589 .21798706 .06700134 .19400025 .08798218 .19400025 .16189575V.2917328C.19400025 .36364747 .23699951 .43156434 .29699708 .43156434 .35299684 .43156434 .36999513 .39361573 .36999513 .30970765V.16189575C.36999513 .08798218 .34700013 .06700134 .34700013 .047027589 .34700013 .017059327 .3659973-.00390625 .43798829-.00390625 .5019989-.00390625 .5219879 .017059327 .5219879 .047027589 .5219879 .06700134 .5069885 .08798218 .5069885 .16189575V.32069398C.5069885 .4455719 .45199586 .5175781 .33699037 .5175781 .24798584 .5175781 .21598816 .4535675 .20298767 .4535675 .19799805 .4535675 .19400025 .4555664 .19400025 .46757508V.48057557C.19400025 .50157168 .1789856 .5175781 .15899658 .5175781 .15299988 .5175781 .1309967 .51556399 .09899902 .50756838 .05999756 .49856568 .03199768 .48857118 .03199768 .4535675 .03199768 .4125824 .057998659 .40559388 .057998659 .3316803V.16189575C.057998659 .08798218 .042999269 .06700134 .042999269 .047027589 .042999269 .017059327 .06199646-.00390625 .12599182-.00390625Z"/>
+      </defs>
+      <g clip-path="url(#cp1)">
+        <use xlink:href="#f1" transform="matrix(88.1282,0,0,-88.1282,156.2451,80.1507)" fill="#466079"/>
+        <use xlink:href="#f2" transform="matrix(88.1282,0,0,-88.1282,201.36675,80.1507)" fill="#466079"/>
+        <use xlink:href="#f3" transform="matrix(88.1282,0,0,-88.1282,222.07688,80.1507)" fill="#466079"/>
+        <use xlink:href="#f4" transform="matrix(88.1282,0,0,-88.1282,266.05287,80.1507)" fill="#466079"/>
+        <use xlink:href="#f5" transform="matrix(88.1282,0,0,-88.1282,286.23423,80.1507)" fill="#466079"/>
+        <use xlink:href="#f6" transform="matrix(88.1282,0,0,-88.1282,335.67414,80.1507)" fill="#466079"/>
+        <use xlink:href="#f7" transform="matrix(88.1282,0,0,-88.1282,372.95237,80.1507)" fill="#466079"/>
+        <use xlink:href="#f8" transform="matrix(88.1282,0,0,-88.1282,403.53285,80.1507)" fill="#466079"/>
+        <use xlink:href="#f9" transform="matrix(88.1282,0,0,-88.1282,451.5627,80.1507)" fill="#466079"/>
+        <use xlink:href="#f3" transform="matrix(88.1282,0,0,-88.1282,499.15196,80.1507)" fill="#466079"/>
+        <path transform="matrix(1,0,0,-1,78.7181,14.937103)" d="M0 0H-44.184C-55.324 0-64.356-9.031-64.356-20.172V-55.801C-52.943-56.642-41.543-57.299-30.367-60.197-30.052-59.647-29.73-59.099-29.388-58.559-21.743-46.468-8.608-37.373 4.055-31.171 5.096-30.662 6.131-30.212 7.165-29.789 2.99-20.388 .617-10.255 0 0" fill="#466079"/>
+        <path transform="matrix(1,0,0,-1,44.294,84.706)" d="M0 0C-9.824 2.389-19.872 3.129-29.931 3.859V-43.643C-29.931-54.783-20.9-63.815-9.759-63.815H-1.365C-1.363-63.789-1.364-63.765-1.362-63.738 .004-49.459-2.107-35.412-2.454-21.158-2.628-13.997-2.027-6.79 0 0" fill="#466079"/>
+        <path transform="matrix(1,0,0,-1,127.7742,14.937103)" d="M0 0H-38.773C-38.17-9.31-36.005-18.518-31.944-26.936-31.944-26.938-31.943-26.94-31.942-26.941-23.059-25.436-14.163-26.523-4.592-28.646 3.741-30.494 12.08-32.832 20.172-35.788V-20.172C20.172-9.031 11.141 0 0 0" fill="#466079"/>
+        <path transform="matrix(1,0,0,-1,53.0209,104.93391)" d="M0 0H94.925V43.291C83.196 47.95 70.736 51.047 58.432 53.208 41.371 56.203 24.718 46.253 12.579 34.942 2.309 25.373-1.095 13.534-.912-.077-.622-.031-.321 0 0 0" fill="#466079"/>
+        <path transform="matrix(1,0,0,-1,53.0209,115.20871)" d="M0 0C-.165 0-.322 .011-.479 .023 .199-11.061 1.253-22.078 .186-33.236 .184-33.262 .178-33.286 .175-33.312H74.753C85.894-33.312 94.925-24.281 94.925-13.14V0Z" fill="#466079"/>
+        <path transform="matrix(1,0,0,-1,524.395,125.8102)" d="M0 0C-1.201 2.777 .114 5.695 1.629 7.942 2.141 8.756 2.869 9.423 3.802 9.713 4.299 9.868 4.712 9.566 4.818 9.09 5.339 5.402 3.042 2.056 0 0M-16.432 23.837C-15.333 25.135-14.049 26.108-12.469 26.632-12.218 26.716-11.737 26.741-11.518 26.638-10.298 26.067-11.175 22.711-11.751 21.465-14.019 16.569-19.486 9.558-23.735 5.908-23.963 12.326-20.406 19.142-16.432 23.837M17.565-3.387C17.146-2.194 16.205-1.87 15.149-1.865 14.915-1.964 14.682-2.065 14.447-2.16 14.23-2.353 13.973-2.498 13.697-2.592 12.743-3.669 11.307-4.313 10.075-4.933 7.92-6.017 4.935-6.097 3.124-4.382 6.873-1.361 10.418 1.919 11.067 6.879 11.302 8.678 11.159 10.467 10.409 12.131 9.567 14 7.754 15.397 5.686 15.609 3.279 15.855 .978 15.061-.927 13.599-6.156 9.585-7.484 3.485-6.608-2.783L-8.235-4.045C-10.251-5.608-12.682-6.27-15.243-5.996-18.15-5.684-21.641-4.3-22.507-1.23-17.092 3.043-12.318 7.893-8.719 13.824-7.612 15.648-6.786 17.53-6.02 19.513-4.598 23.19-4.069 27.657-6.548 30.98-9.305 34.676-15.236 33.527-18.427 30.671-22.123 27.364-25.082 23.321-27.235 18.84-29.888 13.32-30.908 7.312-30.234 1.25-34.182-1.694-38.49-4.681-43.132-6.155-45.272-6.834-48.707-6.47-50.269-4.401-51.149-3.236-50.688-1.07-50.071-.035L-43.398 11.157C-41.31 11.442-37.203 10.972-35.433 11.698-33.917 12.32-33.134 14.088-33.112 15.604-33.096 16.675-33.937 16.986-34.816 16.996L-40.033 17.054-38.935 19.215C-38.561 19.953-38.856 20.768-39.483 21.254-40.162 21.78-40.994 21.863-41.848 22.004-45.57 22.618-45.349 18.652-47.258 16.916L-49.966 16.859C-50.804 16.842-51.791 16.858-52.571 16.498-54.282 15.706-55.183 13.631-54.666 11.872-54.335 10.742-51.886 11.355-50.83 11.062-51.933 9.413-52.888 7.972-53.867 6.325-55.761 3.14-57.679-.297-60.474-2.744-62.599-4.604-65.156-5.85-67.954-6.155-68.908-6.26-70.034-5.854-70.481-5.009-71.158-3.728-70.89-2.268-70.321-.997-68.761 2.488-66.597 4.622-64.826 8.355-64.398 9.256-64.501 10.193-65.362 10.786-67.018 11.929-69.369 12.054-70.761 9.979L-75.044 3.592C-77.165 .43-79.821-2.091-83.141-3.978-85.048-5.062-86.919-6.11-89.016-6.746L-90.704-7.259C-91.443-7.483-92.169-8.61-91.705-9.395-91.221-10.213-90.456-10.952-89.78-11.585-88.795-12.508-87.593-12.638-86.364-12.244-84.401-11.614-82.659-10.685-80.886-9.62L-76.838-7.189C-76.071-8.664-75.466-10.245-73.998-11.072-72.124-12.127-69.934-12.371-67.79-12.352-63.847-12.318-60.222-10.925-57.275-8.377-56.898-8.051-56.489-7.793-56.006-7.507-55.056-8.852-54.066-9.999-52.73-10.923-49.753-12.98-45.595-12.887-42.169-12.127-38.748-11.368-35.653-9.949-32.696-8.107L-27.929-5.137-26.361-7.255C-24.447-9.838-21.548-11.414-18.374-12.067-14.651-12.832-10.903-12.179-7.554-10.429L-3.154-8.13C3.018-13.439 10.811-13.54 17.036-8.366 17.038-8.368 17.041-8.37 17.044-8.373 17.209-8.06 17.432-7.782 17.669-7.512 17.738-7.299 17.811-7.089 17.891-6.883 18.047-5.717 17.946-4.475 17.565-3.387" fill="#466079"/>
+        <path transform="matrix(1,0,0,-1,427.6381,101.10161)" d="M0 0C1.123 .391 2.285 .426 3.259-.182 3.952-.614 4.123-1.403 4.24-2.153 4.435-3.402 4.011-4.413 2.952-5.092 .976-6.362-1.201-7.14-3.577-7.46-6.223-7.815-8.796-7.878-11.478-7.612-14.726-7.289-17.652-5.108-18.561-1.924-19.18 .246-18.501 2.552-17.246 4.366-15.995 6.175-14.457 7.794-12.584 8.968-9.601 10.838-6.296 11.878-2.86 12.607 4.351 14.136 12.939 13.739 20.346 13.213 28.09 12.662 35.693 12.349 43.443 12.494 46.559 12.552 49.521 12.794 52.584 13.23 54.233 13.465 55.736 13.871 57.058 14.853L60.064 17.084C61.003 17.782 62.301 16.59 62.584 15.679 62.883 14.714 63.294 13.769 62.836 12.827 61 9.048 56.811 7.448 52.847 6.927 50.736 6.65 48.672 6.393 46.531 6.409L38.407 6.468 8.467 7.612C4.958 7.746 1.612 7.646-1.793 6.847-4.243 6.273-6.539 5.459-8.682 4.145-9.892 3.403-12.04 1.379-11.745-.223-11.613-.944-10.793-1.396-10.115-1.533-6.587-2.249-3.384-1.178 0 0" fill="#466079"/>
+        <path transform="matrix(1,0,0,-1,395.4585,139.4787)" d="M0 0C-.818 1.313-2.618 4.237-1.659 5.693-.931 6.799 .702 7.194 1.915 7.095 3.75 6.946 4.579 4.175 5.381 3.22 7.801 .339 11.833-.704 15.41 .505 17.172 1.101 18.699 2.06 20.084 3.282 21.373 4.418 22.627 5.582 23.649 7.015L43.132 34.337C45.443 36.94 46.537 41.642 51.108 40.458 51.921 40.248 52.843 40.094 53.233 39.196 53.387 38.842 53.302 38.196 53.248 37.721L46.656 28.126 34.227 10.488 30.977 6.127C28.267 2.491 25.576-.899 21.766-3.414 19.511-4.902 17.096-5.658 14.415-5.958 10.775-6.365 7.204-5.791 4.077-3.86 2.451-2.856 1.006-1.614 0 0" fill="#466079"/>
+        <path transform="matrix(1,0,0,-1,465.9015,109.23981)" d="M0 0C0-2.028-1.644-3.673-3.673-3.673-5.701-3.673-7.346-2.028-7.346 0-7.346 2.028-5.701 3.673-3.673 3.673-1.644 3.673 0 2.028 0 0" fill="#466079"/>
+      </g>
+    </svg>
+  </div>
+  <div>
+    <div class="header-title">Disbursement Dashboard</div>
+    <div class="header-subtitle"></div>
+  </div>
+  <div class="header-date"><strong>Generated</strong><br>April 17, 2026<br><span id="gen-time" style="font-size:0.75rem;opacity:0.7;"></span></div>
+</header>
+
+<div class="main">
+  <div class="metrics">
+    <div class="metric-card">
+      <div class="metric-label">Disbursements This Month</div>
+      <div class="metric-value" id="metric-total">0</div>
+      <div class="metric-sub">Assigned files this month</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Remaining This Month</div>
+      <div class="metric-value" id="metric-upcoming">0</div>
+      <div class="metric-sub">From today forward</div>
+    </div>
+    <div class="metric-card next">
+      <div class="metric-label">Disbursements Tomorrow</div>
+      <div class="metric-value" id="metric-next-date">0</div>
+      <div class="metric-sub" id="metric-next-borrower"></div>
+    </div>
+  </div>
+  <div class="controls">
+    <button class="filter-btn all active" onclick="setFilter('all',this)">All Files</button>
+    <button class="filter-btn melissa-btn" onclick="setFilter('Melissa Foglia',this)">Melissa Foglia</button>
+    <button class="filter-btn heather-btn" onclick="setFilter('Heather Barron',this)">Heather Barron</button>
+    <input class="search-bar" id="searchBar" type="text" placeholder="Search by name, address, order #..." oninput="renderAll()">
+  </div>
+  <div class="calendar-wrap">
+    <div class="calendar-header-row">
+      <div class="cal-col-head">Monday</div>
+      <div class="cal-col-head">Tuesday</div>
+      <div class="cal-col-head">Wednesday</div>
+      <div class="cal-col-head">Thursday</div>
+      <div class="cal-col-head">Friday</div>
+    </div>
+    <div class="calendar-grid" id="calGrid"></div>
+  </div>
+  <div class="detail-section">
+    <div class="detail-header" id="detailHeader">Click a date to see disbursement details</div>
+    <div id="detailBody">
+      <div class="detail-empty">Select a date on the calendar above to view disbursement details.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const DATA = [
+{
+"disbursementDate": "05/07/2026",
+"disbursementDateISO": "2026-05-07",
+"orderNumber": "2026-11",
+"closingDate": "05/07/2026",
+"assignee": "Melissa Foglia",
+"address": "23560 Wellington Avenue",
+"borrower": "Gurin,Stewart"
+},
+{
+"disbursementDate": "03/18/2026",
+"disbursementDateISO": "2026-03-18",
+"orderNumber": "2026-69",
+"closingDate": "03/17/2026",
+"assignee": "Heather Barron",
+"address": "14730 Seven Mile West, 209 Morton Street, 15639 West 10 Mile Road, 1904 Springwells Street, 4119 West Pierson Road, 11234 East McNichols Road, 15659 West 10 Mile Road",
+"borrower": "Yono,,,,,,"
+},
+{
+"disbursementDate": "04/16/2026",
+"disbursementDateISO": "2026-04-16",
+"orderNumber": "2026-81",
+"closingDate": "04/11/2026",
+"assignee": "Melissa Foglia",
+"address": "9919 Spruce Street",
+"borrower": "Kolenda"
+},
+{
+"disbursementDate": "04/16/2026",
+"disbursementDateISO": "2026-04-16",
+"orderNumber": "2026-104",
+"closingDate": "04/11/2026",
+"assignee": "Melissa Foglia",
+"address": "307 Buckhorn Road",
+"borrower": "Boyland"
+},
+{
+"disbursementDate": "04/13/2026",
+"disbursementDateISO": "2026-04-13",
+"orderNumber": "2026-116",
+"closingDate": "04/07/2026",
+"assignee": "Melissa Foglia",
+"address": "9971 Pine Grove Court",
+"borrower": "Spann"
+},
+{
+"disbursementDate": "04/17/2026",
+"disbursementDateISO": "2026-04-17",
+"orderNumber": "2026-129",
+"closingDate": "04/13/2026",
+"assignee": "Heather Barron",
+"address": "2380 Bony Lake Road",
+"borrower": "Abell,Abell"
+},
+{
+"disbursementDate": "04/17/2026",
+"disbursementDateISO": "2026-04-17",
+"orderNumber": "2026-158",
+"closingDate": "04/13/2026",
+"assignee": "Heather Barron",
+"address": "8 Bowser Road",
+"borrower": "Irving"
+},
+{
+"disbursementDate": "04/14/2026",
+"disbursementDateISO": "2026-04-14",
+"orderNumber": "2026-179",
+"closingDate": "04/09/2026",
+"assignee": "Heather Barron",
+"address": "46161 Hollowoode Lane",
+"borrower": "Bell"
+},
+{
+"disbursementDate": "04/22/2026",
+"disbursementDateISO": "2026-04-22",
+"orderNumber": "2026-186",
+"closingDate": "04/17/2026",
+"assignee": "Heather Barron",
+"address": "640 Miriah Drive",
+"borrower": "Ailiff,Ailiff"
+},
+{
+"disbursementDate": "04/27/2026",
+"disbursementDateISO": "2026-04-27",
+"orderNumber": "2026-218",
+"closingDate": "04/22/2026",
+"assignee": "Melissa Foglia",
+"address": "3 John Paul Jones Drive",
+"borrower": "Douglas"
+},
+{
+"disbursementDate": "04/15/2026",
+"disbursementDateISO": "2026-04-15",
+"orderNumber": "2026-225",
+"closingDate": "04/10/2026",
+"assignee": "Heather Barron",
+"address": "337 Solar Drive",
+"borrower": "Sparks"
+},
+{
+"disbursementDate": "04/22/2026",
+"disbursementDateISO": "2026-04-22",
+"orderNumber": "2026-239",
+"closingDate": "04/17/2026",
+"assignee": "Heather Barron",
+"address": "107 Theresa Street",
+"borrower": "Hairston"
+},
+{
+"disbursementDate": "04/22/2026",
+"disbursementDateISO": "2026-04-22",
+"orderNumber": "2026-241",
+"closingDate": "04/17/2026",
+"assignee": "Melissa Foglia",
+"address": "633 Raab Street",
+"borrower": "Benitez"
+},
+{
+"disbursementDate": "04/14/2026",
+"disbursementDateISO": "2026-04-14",
+"orderNumber": "2026-267",
+"closingDate": "04/14/2026",
+"assignee": "Melissa Foglia",
+"address": "8331 Stanley Drive",
+"borrower": "Tricoli"
+}
+];
+
+const TODAY_ISO = "2026-04-17";
+const MONTH_YEAR = "April 2026";
+
+const CALENDAR_WEEKS = [[null, null, "2026-04-01", "2026-04-02", "2026-04-03"], ["2026-04-06", "2026-04-07", "2026-04-08", "2026-04-09", "2026-04-10"], ["2026-04-13", "2026-04-14", "2026-04-15", "2026-04-16", "2026-04-17"], ["2026-04-20", "2026-04-21", "2026-04-22", "2026-04-23", "2026-04-24"], ["2026-04-27", "2026-04-28", "2026-04-29", "2026-04-30", null]];
+
+let currentFilter = 'all';
+let selectedDate = null;
+
+function getFilteredData() {
+  const q = document.getElementById('searchBar').value.toLowerCase().trim();
+  return DATA.filter(r => {
+    if (currentFilter !== 'all' && r.assignee !== currentFilter) return false;
+    if (q) {
+      const haystack = (r.orderNumber + ' ' + r.borrower + ' ' + r.address + ' ' + r.assignee).toLowerCase();
+      if (!haystack.includes(q)) return false;
+    }
+    return true;
+  });
+}
+
+function pillClass(assignee) {
+  if (assignee === 'Melissa Foglia') return 'melissa';
+  if (assignee === 'Heather Barron') return 'heather';
+  return 'other';
+}
+
+function assigneeClass(assignee) {
+  if (assignee === 'Melissa Foglia') return 'melissa';
+  if (assignee === 'Heather Barron') return 'heather';
+  return 'other';
+}
+
+function findNextUpcomingDate(data) {
+  const future = data.filter(r => r.disbursementDateISO >= TODAY_ISO)
+    .sort((a,b) => a.disbursementDateISO.localeCompare(b.disbursementDateISO));
+  return future.length ? future[0].disbursementDateISO : null;
+}
+
+function fmtDate(iso) {
+  if (!iso) return '';
+  const parts = iso.split('-');
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return months[parseInt(parts[1])-1] + ' ' + parseInt(parts[2]);
+}
+
+function renderCalendar(data) {
+  const grid = document.getElementById('calGrid');
+  const byDate = {};
+  data.forEach(r => {
+    if (!byDate[r.disbursementDateISO]) byDate[r.disbursementDateISO] = [];
+    byDate[r.disbursementDateISO].push(r);
+  });
+  const nextUpcoming = findNextUpcomingDate(DATA.filter(r => currentFilter === 'all' || r.assignee === currentFilter));
+  grid.innerHTML = '';
+  CALENDAR_WEEKS.forEach(function(week) {
+    week.forEach(function(dayISO) {
+      const cell = document.createElement('div');
+      if (!dayISO) { cell.className = 'cal-day empty'; grid.appendChild(cell); return; }
+      let cls = 'cal-day';
+      if (dayISO === TODAY_ISO) cls += ' today';
+      else if (dayISO === nextUpcoming) cls += ' next-upcoming';
+      if (dayISO === selectedDate) cls += ' selected';
+      cell.className = cls;
+      cell.dataset.date = dayISO;
+      const dayNum = parseInt(dayISO.split('-')[2]);
+      const numDiv = document.createElement('div');
+      numDiv.className = 'day-num';
+      numDiv.innerHTML = dayNum + (dayISO === TODAY_ISO ? ' <span class="today-label">Today</span>' : '');
+      cell.appendChild(numDiv);
+      if (byDate[dayISO]) {
+        byDate[dayISO].forEach(function(r) {
+          const pill = document.createElement('span');
+          pill.className = 'pill ' + pillClass(r.assignee);
+          const shortAddr = r.address.split(',')[0].substring(0, 30);
+          pill.innerHTML = '<span class="pill-order">' + r.orderNumber + '</span><br>' + r.borrower.split(',')[0] + '<br>' + shortAddr;
+          cell.appendChild(pill);
+        });
+      }
+      cell.addEventListener('click', function() { selectedDate = dayISO; renderAll(); showDetail(dayISO, data); });
+      grid.appendChild(cell);
+    });
+  });
+}
+
+function showDetail(dateISO, data) {
+  const rows = data.filter(r => r.disbursementDateISO === dateISO);
+  const header = document.getElementById('detailHeader');
+  const body = document.getElementById('detailBody');
+  const label = fmtDate(dateISO) + (dateISO === TODAY_ISO ? ' - Today' : '');
+  header.textContent = 'Disbursements for ' + label + ' (' + rows.length + ' file' + (rows.length !== 1 ? 's' : '') + ')';
+  if (rows.length === 0) { body.innerHTML = '<div class="detail-empty">No disbursements scheduled for this date.</div>'; return; }
+  let html = '<table><thead><tr><th>Order #</th><th>Borrower</th><th>Address</th><th>Assigned To</th><th>Close Date</th></tr></thead><tbody>';
+  rows.forEach(function(r) {
+    html += '<tr><td><strong>' + r.orderNumber + '</strong></td><td>' + (r.borrower || '-') + '</td><td>' + r.address + '</td><td><span class="assignee-badge ' + assigneeClass(r.assignee) + '">' + r.assignee + '</span></td><td>' + (r.closingDate || '-') + '</td></tr>';
+  });
+  html += '</tbody></table>';
+  body.innerHTML = html;
+}
+
+function setFilter(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderAll();
+}
+
+function renderAll() {
+  const data = getFilteredData();
+  renderCalendar(data);
+  updateMetrics(data);
+  if (selectedDate) showDetail(selectedDate, data);
+}
+
+function updateMetrics(data) {
+  const upcoming = data.filter(r => r.disbursementDateISO >= TODAY_ISO).length;
+  document.getElementById('metric-total').textContent = data.length;
+  document.getElementById('metric-upcoming').textContent = upcoming;
+  var nextBizDay = getNextBusinessDay(TODAY_ISO);
+  var tomorrowFiles = DATA.filter(function(r) { return r.disbursementDateISO === nextBizDay; });
+  document.getElementById('metric-next-date').textContent = tomorrowFiles.length;
+  document.getElementById('metric-next-borrower').textContent = tomorrowFiles.length > 0 ? fmtDate(nextBizDay) : 'No disbursements';
+}
+
+function getNextBusinessDay(isoDate) {
+  var parts = isoDate.split('-');
+  var d = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
+  d.setDate(d.getDate() + 1);
+  while (d.getDay() === 0 || d.getDay() === 6) { d.setDate(d.getDate() + 1); }
+  var mm = String(d.getMonth()+1).padStart(2,'0');
+  var dd = String(d.getDate()).padStart(2,'0');
+  return d.getFullYear() + '-' + mm + '-' + dd;
+}
+
+var now = new Date();
+var timeStr = now.toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit', hour12: true});
+document.getElementById('gen-time').textContent = 'Last viewed: ' + timeStr;
+
+renderAll();
+</script>
+</body>
+</html>
