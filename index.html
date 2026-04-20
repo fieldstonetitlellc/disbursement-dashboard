@@ -10,15 +10,13 @@
   .header { background: #466079; color: #fff; padding: 18px 32px; display: flex; align-items: center; gap: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.18); }
   .header-logo { display: flex; align-items: center; }
   .header-title { font-size: 1.3rem; font-weight: 700; letter-spacing: 0.02em; }
-  .header-subtitle { font-size: 0.82rem; opacity: 0.78; margin-top: 2px; }
-  .header-date { margin-left: auto; font-size: 0.82rem; opacity: 0.78; }
+  .header-date { margin-left: auto; font-size: 0.82rem; opacity: 0.78; text-align: right; }
   .main { max-width: 1200px; margin: 0 auto; padding: 28px 24px; }
   .metrics { display: flex; gap: 16px; margin-bottom: 28px; flex-wrap: wrap; }
   .metric-card { background: #fff; border-radius: 10px; padding: 18px 24px; flex: 1; min-width: 180px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); border-top: 3px solid #466079; }
   .metric-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; color: #6b7a8d; margin-bottom: 6px; }
   .metric-value { font-size: 2rem; font-weight: 700; color: #466079; line-height: 1; }
   .metric-sub { font-size: 0.78rem; color: #8a95a3; margin-top: 4px; }
-  .metric-card.next { border-top-color: #466079; }
   .controls { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
   .filter-btn { padding: 7px 18px; border-radius: 20px; border: 2px solid transparent; cursor: pointer; font-size: 0.84rem; font-weight: 600; transition: all 0.15s; }
   .filter-btn.all { background: #e8edf2; color: #466079; border-color: #c5ced8; }
@@ -30,15 +28,20 @@
   .search-bar { margin-left: auto; padding: 7px 14px; border: 1.5px solid #c5ced8; border-radius: 20px; font-size: 0.84rem; outline: none; width: 240px; }
   .search-bar:focus { border-color: #466079; }
   .calendar-wrap { background: #fff; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); overflow: hidden; margin-bottom: 24px; }
+  .cal-nav { display: flex; align-items: center; justify-content: space-between; padding: 10px 20px; background: #344a5c; }
+  .cal-nav-btn { background: none; border: 1.5px solid rgba(255,255,255,0.4); cursor: pointer; color: #fff; font-size: 0.9rem; padding: 4px 16px; border-radius: 4px; font-weight: 700; }
+  .cal-nav-btn:hover { background: rgba(255,255,255,0.15); }
+  .cal-nav-title { font-size: 1.05rem; font-weight: 700; color: #fff; letter-spacing: 0.04em; }
   .calendar-header-row { display: grid; grid-template-columns: repeat(5, 1fr); background: #466079; }
   .cal-col-head { text-align: center; padding: 10px 4px; color: #fff; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; }
   .calendar-grid { display: grid; grid-template-columns: repeat(5, 1fr); }
-  .cal-day { border: 1px solid #e6eaf0; min-height: 110px; padding: 8px 6px; cursor: pointer; transition: background 0.12s; vertical-align: top; }
+  .cal-day { border: 1px solid #e6eaf0; min-height: 110px; padding: 8px 6px; cursor: pointer; transition: background 0.12s; }
   .cal-day:hover { background: #f0f4f8; }
   .cal-day.empty { background: #f9fafb; cursor: default; }
   .cal-day.today { border: 2.5px solid #466079; background: #eef3f8; }
   .cal-day.next-upcoming { border: 2px solid #F4C0D1; background: #fef8fb; }
   .cal-day.selected { background: #e8edf2; }
+  .cal-day.other-month { opacity: 0.4; }
   .day-num { font-size: 0.8rem; font-weight: 700; color: #8a95a3; margin-bottom: 5px; }
   .cal-day.today .day-num { color: #466079; }
   .pill { display: block; border-radius: 6px; padding: 4px 7px; font-size: 0.72rem; line-height: 1.35; margin-bottom: 4px; border: 1px solid; word-break: break-word; }
@@ -47,7 +50,7 @@
   .pill.other { background: #e8edf2; color: #3a4a5c; border-color: #c5ced8; }
   .pill .pill-order { font-weight: 700; }
   .detail-section { background: #fff; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); overflow: hidden; }
-  .detail-header { padding: 14px 20px; background: #466079; color: #fff; font-size: 0.95rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+  .detail-header { padding: 14px 20px; background: #466079; color: #fff; font-size: 0.95rem; font-weight: 700; }
   .detail-empty { padding: 24px 20px; color: #8a95a3; font-size: 0.88rem; text-align: center; }
   table { width: 100%; border-collapse: collapse; }
   th { background: #f0f4f8; color: #466079; font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.05em; padding: 10px 14px; text-align: left; font-weight: 700; }
@@ -102,9 +105,8 @@
   </div>
   <div>
     <div class="header-title">Disbursement Dashboard</div>
-    <div class="header-subtitle"></div>
   </div>
-  <div class="header-date"><strong>Generated</strong><br>April 17, 2026<br><span id="gen-time" style="font-size:0.75rem;opacity:0.7;"></span></div>
+  <div class="header-date"><strong>Generated</strong><br>April 20, 2026<br><span id="gen-time" style="font-size:0.75rem;opacity:0.7;"></span></div>
 </header>
 
 <div class="main">
@@ -119,7 +121,7 @@
       <div class="metric-value" id="metric-upcoming">0</div>
       <div class="metric-sub">From today forward</div>
     </div>
-    <div class="metric-card next">
+    <div class="metric-card">
       <div class="metric-label">Disbursements Tomorrow</div>
       <div class="metric-value" id="metric-next-date">0</div>
       <div class="metric-sub" id="metric-next-borrower"></div>
@@ -132,6 +134,11 @@
     <input class="search-bar" id="searchBar" type="text" placeholder="Search by name, address, order #..." oninput="renderAll()">
   </div>
   <div class="calendar-wrap">
+    <div class="cal-nav">
+      <button class="cal-nav-btn" onclick="changeMonth(-1)">&#8592; Prev</button>
+      <div class="cal-nav-title" id="cal-nav-title">April 2026</div>
+      <button class="cal-nav-btn" onclick="changeMonth(1)">Next &#8594;</button>
+    </div>
     <div class="calendar-header-row">
       <div class="cal-col-head">Monday</div>
       <div class="cal-col-head">Tuesday</div>
@@ -150,271 +157,200 @@
 </div>
 
 <script>
-const DATA = [
-{
-"disbursementDate": "05/07/2026",
-"disbursementDateISO": "2026-05-07",
-"orderNumber": "2026-11",
-"closingDate": "05/07/2026",
-"assignee": "Melissa Foglia",
-"address": "23560 Wellington Avenue",
-"borrower": "Gurin,Stewart"
-},
-{
-"disbursementDate": "03/18/2026",
-"disbursementDateISO": "2026-03-18",
-"orderNumber": "2026-69",
-"closingDate": "03/17/2026",
-"assignee": "Heather Barron",
-"address": "14730 Seven Mile West, 209 Morton Street, 15639 West 10 Mile Road, 1904 Springwells Street, 4119 West Pierson Road, 11234 East McNichols Road, 15659 West 10 Mile Road",
-"borrower": "Yono,,,,,,"
-},
-{
-"disbursementDate": "04/16/2026",
-"disbursementDateISO": "2026-04-16",
-"orderNumber": "2026-81",
-"closingDate": "04/11/2026",
-"assignee": "Melissa Foglia",
-"address": "9919 Spruce Street",
-"borrower": "Kolenda"
-},
-{
-"disbursementDate": "04/16/2026",
-"disbursementDateISO": "2026-04-16",
-"orderNumber": "2026-104",
-"closingDate": "04/11/2026",
-"assignee": "Melissa Foglia",
-"address": "307 Buckhorn Road",
-"borrower": "Boyland"
-},
-{
-"disbursementDate": "04/13/2026",
-"disbursementDateISO": "2026-04-13",
-"orderNumber": "2026-116",
-"closingDate": "04/07/2026",
-"assignee": "Melissa Foglia",
-"address": "9971 Pine Grove Court",
-"borrower": "Spann"
-},
-{
-"disbursementDate": "04/17/2026",
-"disbursementDateISO": "2026-04-17",
-"orderNumber": "2026-129",
-"closingDate": "04/13/2026",
-"assignee": "Heather Barron",
-"address": "2380 Bony Lake Road",
-"borrower": "Abell,Abell"
-},
-{
-"disbursementDate": "04/17/2026",
-"disbursementDateISO": "2026-04-17",
-"orderNumber": "2026-158",
-"closingDate": "04/13/2026",
-"assignee": "Heather Barron",
-"address": "8 Bowser Road",
-"borrower": "Irving"
-},
-{
-"disbursementDate": "04/14/2026",
-"disbursementDateISO": "2026-04-14",
-"orderNumber": "2026-179",
-"closingDate": "04/09/2026",
-"assignee": "Heather Barron",
-"address": "46161 Hollowoode Lane",
-"borrower": "Bell"
-},
-{
-"disbursementDate": "04/22/2026",
-"disbursementDateISO": "2026-04-22",
-"orderNumber": "2026-186",
-"closingDate": "04/17/2026",
-"assignee": "Heather Barron",
-"address": "640 Miriah Drive",
-"borrower": "Ailiff,Ailiff"
-},
-{
-"disbursementDate": "04/27/2026",
-"disbursementDateISO": "2026-04-27",
-"orderNumber": "2026-218",
-"closingDate": "04/22/2026",
-"assignee": "Melissa Foglia",
-"address": "3 John Paul Jones Drive",
-"borrower": "Douglas"
-},
-{
-"disbursementDate": "04/15/2026",
-"disbursementDateISO": "2026-04-15",
-"orderNumber": "2026-225",
-"closingDate": "04/10/2026",
-"assignee": "Heather Barron",
-"address": "337 Solar Drive",
-"borrower": "Sparks"
-},
-{
-"disbursementDate": "04/22/2026",
-"disbursementDateISO": "2026-04-22",
-"orderNumber": "2026-239",
-"closingDate": "04/17/2026",
-"assignee": "Heather Barron",
-"address": "107 Theresa Street",
-"borrower": "Hairston"
-},
-{
-"disbursementDate": "04/22/2026",
-"disbursementDateISO": "2026-04-22",
-"orderNumber": "2026-241",
-"closingDate": "04/17/2026",
-"assignee": "Melissa Foglia",
-"address": "633 Raab Street",
-"borrower": "Benitez"
-},
-{
-"disbursementDate": "04/14/2026",
-"disbursementDateISO": "2026-04-14",
-"orderNumber": "2026-267",
-"closingDate": "04/14/2026",
-"assignee": "Melissa Foglia",
-"address": "8331 Stanley Drive",
-"borrower": "Tricoli"
+var DATA = [{"disbursementDate": "05/07/2026", "disbursementDateISO": "2026-05-07", "orderNumber": "2026-11", "closingDate": "05/07/2026", "assignee": "Melissa Foglia", "address": "23560 Wellington Avenue", "borrower": "Gurin,Stewart"}, {"disbursementDate": "03/18/2026", "disbursementDateISO": "2026-03-18", "orderNumber": "2026-69", "closingDate": "03/17/2026", "assignee": "Heather Barron", "address": "14730 Seven Mile West, 209 Morton Street, 15639 West 10 Mile Road, 1904 Springwells Street, 4119 West Pierson Road, 11234 East McNichols Road, 15659 West 10 Mile Road", "borrower": "Yono,,,,,,"}, {"disbursementDate": "04/20/2026", "disbursementDateISO": "2026-04-20", "orderNumber": "2026-110", "closingDate": "04/20/2026", "assignee": "Melissa Foglia", "address": "50444 Pinnacle Woods Ln", "borrower": "Adam"}, {"disbursementDate": "04/17/2026", "disbursementDateISO": "2026-04-17", "orderNumber": "2026-112", "closingDate": "04/17/2026", "assignee": "Melissa Foglia", "address": "3915 Jennings Drive", "borrower": "Cortright"}, {"disbursementDate": "04/27/2026", "disbursementDateISO": "2026-04-27", "orderNumber": "2026-114", "closingDate": "04/21/2026", "assignee": "Heather Barron", "address": "820 Cady Road", "borrower": "Hardwick"}, {"disbursementDate": "04/13/2026", "disbursementDateISO": "2026-04-13", "orderNumber": "2026-116", "closingDate": "04/07/2026", "assignee": "Melissa Foglia", "address": "9971 Pine Grove Court", "borrower": "Spann"}, {"disbursementDate": "04/24/2026", "disbursementDateISO": "2026-04-24", "orderNumber": "2026-134", "closingDate": "04/20/2026", "assignee": "Heather Barron", "address": "106 Randolph Lane", "borrower": "Norman,Owens"}, {"disbursementDate": "04/22/2026", "disbursementDateISO": "2026-04-22", "orderNumber": "2026-186", "closingDate": "04/17/2026", "assignee": "Heather Barron", "address": "640 Miriah Drive", "borrower": "Ailiff,Ailiff"}, {"disbursementDate": "04/27/2026", "disbursementDateISO": "2026-04-27", "orderNumber": "2026-218", "closingDate": "04/22/2026", "assignee": "Melissa Foglia", "address": "3 John Paul Jones Drive", "borrower": "Douglas"}, {"disbursementDate": "04/22/2026", "disbursementDateISO": "2026-04-22", "orderNumber": "2026-239", "closingDate": "04/17/2026", "assignee": "Heather Barron", "address": "107 Theresa Street", "borrower": "Hairston"}, {"disbursementDate": "04/22/2026", "disbursementDateISO": "2026-04-22", "orderNumber": "2026-241", "closingDate": "04/17/2026", "assignee": "Melissa Foglia", "address": "633 Raab Street", "borrower": "Benitez"}, {"disbursementDate": "04/20/2026", "disbursementDateISO": "2026-04-20", "orderNumber": "2026-254", "closingDate": "04/20/2026", "assignee": "Melissa Foglia", "address": "12661 Riad Street", "borrower": ""}, {"disbursementDate": "04/14/2026", "disbursementDateISO": "2026-04-14", "orderNumber": "2026-267", "closingDate": "04/14/2026", "assignee": "Melissa Foglia", "address": "8331 Stanley Drive", "borrower": "Tricoli"}, {"disbursementDate": "04/20/2026", "disbursementDateISO": "2026-04-20", "orderNumber": "2026-269", "closingDate": "04/20/2026", "assignee": "Melissa Foglia", "address": "28423 Cumberland Street", "borrower": "Dresevic"}];
+
+
+var TODAY_ISO = "2026-04-20";
+var monthOffset = 0;
+var currentFilter = 'all';
+var selectedDate = null;
+
+function getMonthData(offset) {
+  var parts = TODAY_ISO.split('-');
+  var year = parseInt(parts[0]);
+  var month = parseInt(parts[1]) - 1 + offset;
+  while (month > 11) { month -= 12; year++; }
+  while (month < 0) { month += 12; year--; }
+  var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var label = monthNames[month] + ' ' + year;
+  var firstDay = new Date(year, month, 1);
+  var lastDay = new Date(year, month + 1, 0);
+  var weeks = [];
+  var week = [];
+  var dow = firstDay.getDay();
+  var monOffset = dow === 0 ? 6 : dow - 1;
+  for (var i = 0; i < monOffset; i++) week.push(null);
+  for (var d = 1; d <= lastDay.getDate(); d++) {
+    var date = new Date(year, month, d);
+    var dayDow = date.getDay();
+    if (dayDow === 0 || dayDow === 6) continue;
+    var mm = String(month + 1).padStart(2, '0');
+    var dd = String(d).padStart(2, '0');
+    week.push(year + '-' + mm + '-' + dd);
+    if (week.length === 5) { weeks.push(week); week = []; }
+  }
+  if (week.length > 0) {
+    while (week.length < 5) week.push(null);
+    weeks.push(week);
+  }
+  return { label: label, weeks: weeks };
 }
-];
 
-const TODAY_ISO = "2026-04-17";
-const MONTH_YEAR = "April 2026";
-
-const CALENDAR_WEEKS = [[null, null, "2026-04-01", "2026-04-02", "2026-04-03"], ["2026-04-06", "2026-04-07", "2026-04-08", "2026-04-09", "2026-04-10"], ["2026-04-13", "2026-04-14", "2026-04-15", "2026-04-16", "2026-04-17"], ["2026-04-20", "2026-04-21", "2026-04-22", "2026-04-23", "2026-04-24"], ["2026-04-27", "2026-04-28", "2026-04-29", "2026-04-30", null]];
-
-let currentFilter = 'all';
-let selectedDate = null;
+function changeMonth(dir) {
+  monthOffset += dir;
+  selectedDate = null;
+  document.getElementById('detailBody').innerHTML = '<div class="detail-empty">Select a date on the calendar above to view disbursement details.</div>';
+  document.getElementById('detailHeader').textContent = 'Click a date to see disbursement details';
+  renderAll();
+}
 
 function getFilteredData() {
-  const q = document.getElementById('searchBar').value.toLowerCase().trim();
-  return DATA.filter(r => {
+  var q = document.getElementById('searchBar').value.toLowerCase().trim();
+  return DATA.filter(function(r) {
     if (currentFilter !== 'all' && r.assignee !== currentFilter) return false;
     if (q) {
-      const haystack = (r.orderNumber + ' ' + r.borrower + ' ' + r.address + ' ' + r.assignee).toLowerCase();
-      if (!haystack.includes(q)) return false;
+      var haystack = (r.orderNumber + ' ' + r.borrower + ' ' + r.address + ' ' + r.assignee).toLowerCase();
+      if (haystack.indexOf(q) === -1) return false;
     }
     return true;
   });
 }
 
-function pillClass(assignee) {
-  if (assignee === 'Melissa Foglia') return 'melissa';
-  if (assignee === 'Heather Barron') return 'heather';
+function pillClass(a) {
+  if (a === 'Melissa Foglia') return 'melissa';
+  if (a === 'Heather Barron') return 'heather';
   return 'other';
 }
 
-function assigneeClass(assignee) {
-  if (assignee === 'Melissa Foglia') return 'melissa';
-  if (assignee === 'Heather Barron') return 'heather';
+function assigneeClass(a) {
+  if (a === 'Melissa Foglia') return 'melissa';
+  if (a === 'Heather Barron') return 'heather';
   return 'other';
-}
-
-function findNextUpcomingDate(data) {
-  const future = data.filter(r => r.disbursementDateISO >= TODAY_ISO)
-    .sort((a,b) => a.disbursementDateISO.localeCompare(b.disbursementDateISO));
-  return future.length ? future[0].disbursementDateISO : null;
 }
 
 function fmtDate(iso) {
   if (!iso) return '';
-  const parts = iso.split('-');
-  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  return months[parseInt(parts[1])-1] + ' ' + parseInt(parts[2]);
+  var p = iso.split('-');
+  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return months[parseInt(p[1])-1] + ' ' + parseInt(p[2]);
 }
 
-function renderCalendar(data) {
-  const grid = document.getElementById('calGrid');
-  const byDate = {};
-  data.forEach(r => {
+function findNextUpcoming() {
+  var future = DATA.filter(function(r) { return r.disbursementDateISO >= TODAY_ISO; });
+  future.sort(function(a,b) { return a.disbursementDateISO.localeCompare(b.disbursementDateISO); });
+  return future.length ? future[0].disbursementDateISO : null;
+}
+
+function getNextBusinessDay() {
+  var p = TODAY_ISO.split('-');
+  var d = new Date(parseInt(p[0]), parseInt(p[1])-1, parseInt(p[2]));
+  d.setDate(d.getDate() + 1);
+  while (d.getDay() === 0 || d.getDay() === 6) d.setDate(d.getDate() + 1);
+  var mm = String(d.getMonth()+1).padStart(2,'0');
+  var dd = String(d.getDate()).padStart(2,'0');
+  return d.getFullYear() + '-' + mm + '-' + dd;
+}
+
+function renderCalendar(filteredData) {
+  var grid = document.getElementById('calGrid');
+  var monthData = getMonthData(monthOffset);
+  document.getElementById('cal-nav-title').textContent = monthData.label;
+
+  var byDate = {};
+  filteredData.forEach(function(r) {
     if (!byDate[r.disbursementDateISO]) byDate[r.disbursementDateISO] = [];
     byDate[r.disbursementDateISO].push(r);
   });
-  const nextUpcoming = findNextUpcomingDate(DATA.filter(r => currentFilter === 'all' || r.assignee === currentFilter));
+
+  var nextUpcoming = findNextUpcoming();
   grid.innerHTML = '';
-  CALENDAR_WEEKS.forEach(function(week) {
+
+  monthData.weeks.forEach(function(week) {
     week.forEach(function(dayISO) {
-      const cell = document.createElement('div');
-      if (!dayISO) { cell.className = 'cal-day empty'; grid.appendChild(cell); return; }
-      let cls = 'cal-day';
+      var cell = document.createElement('div');
+      if (!dayISO) {
+        cell.className = 'cal-day empty';
+        grid.appendChild(cell);
+        return;
+      }
+      var cls = 'cal-day';
       if (dayISO === TODAY_ISO) cls += ' today';
-      else if (dayISO === nextUpcoming) cls += ' next-upcoming';
+      else if (dayISO === nextUpcoming && monthOffset === 0) cls += ' next-upcoming';
       if (dayISO === selectedDate) cls += ' selected';
       cell.className = cls;
-      cell.dataset.date = dayISO;
-      const dayNum = parseInt(dayISO.split('-')[2]);
-      const numDiv = document.createElement('div');
+      cell.setAttribute('data-date', dayISO);
+
+      var dayNum = parseInt(dayISO.split('-')[2]);
+      var numDiv = document.createElement('div');
       numDiv.className = 'day-num';
       numDiv.innerHTML = dayNum + (dayISO === TODAY_ISO ? ' <span class="today-label">Today</span>' : '');
       cell.appendChild(numDiv);
+
       if (byDate[dayISO]) {
         byDate[dayISO].forEach(function(r) {
-          const pill = document.createElement('span');
+          var pill = document.createElement('span');
           pill.className = 'pill ' + pillClass(r.assignee);
-          const shortAddr = r.address.split(',')[0].substring(0, 30);
+          var shortAddr = r.address.split(',')[0].substring(0, 30);
           pill.innerHTML = '<span class="pill-order">' + r.orderNumber + '</span><br>' + r.borrower.split(',')[0] + '<br>' + shortAddr;
           cell.appendChild(pill);
         });
       }
-      cell.addEventListener('click', function() { selectedDate = dayISO; renderAll(); showDetail(dayISO, data); });
+
+      cell.addEventListener('click', function() {
+        selectedDate = dayISO;
+        renderAll();
+        showDetail(dayISO, filteredData);
+      });
       grid.appendChild(cell);
     });
   });
 }
 
 function showDetail(dateISO, data) {
-  const rows = data.filter(r => r.disbursementDateISO === dateISO);
-  const header = document.getElementById('detailHeader');
-  const body = document.getElementById('detailBody');
-  const label = fmtDate(dateISO) + (dateISO === TODAY_ISO ? ' - Today' : '');
+  var rows = data.filter(function(r) { return r.disbursementDateISO === dateISO; });
+  var header = document.getElementById('detailHeader');
+  var body = document.getElementById('detailBody');
+  var label = fmtDate(dateISO) + (dateISO === TODAY_ISO ? ' - Today' : '');
   header.textContent = 'Disbursements for ' + label + ' (' + rows.length + ' file' + (rows.length !== 1 ? 's' : '') + ')';
-  if (rows.length === 0) { body.innerHTML = '<div class="detail-empty">No disbursements scheduled for this date.</div>'; return; }
-  let html = '<table><thead><tr><th>Order #</th><th>Borrower</th><th>Address</th><th>Assigned To</th><th>Close Date</th></tr></thead><tbody>';
+  if (rows.length === 0) {
+    body.innerHTML = '<div class="detail-empty">No disbursements scheduled for this date.</div>';
+    return;
+  }
+  var html = '<table><thead><tr><th>Order #</th><th>Borrower</th><th>Address</th><th>Assigned To</th><th>Close Date</th></tr></thead><tbody>';
   rows.forEach(function(r) {
-    html += '<tr><td><strong>' + r.orderNumber + '</strong></td><td>' + (r.borrower || '-') + '</td><td>' + r.address + '</td><td><span class="assignee-badge ' + assigneeClass(r.assignee) + '">' + r.assignee + '</span></td><td>' + (r.closingDate || '-') + '</td></tr>';
+    html += '<tr><td><strong>' + r.orderNumber + '</strong></td><td>' + (r.borrower||'-') + '</td><td>' + r.address + '</td><td><span class="assignee-badge ' + assigneeClass(r.assignee) + '">' + r.assignee + '</span></td><td>' + (r.closingDate||'-') + '</td></tr>';
   });
   html += '</tbody></table>';
   body.innerHTML = html;
 }
 
-function setFilter(f, btn) {
-  currentFilter = f;
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  renderAll();
-}
-
-function renderAll() {
-  const data = getFilteredData();
-  renderCalendar(data);
-  updateMetrics(data);
-  if (selectedDate) showDetail(selectedDate, data);
-}
-
 function updateMetrics(data) {
-  const upcoming = data.filter(r => r.disbursementDateISO >= TODAY_ISO).length;
+  var upcoming = data.filter(function(r) { return r.disbursementDateISO >= TODAY_ISO; }).length;
   document.getElementById('metric-total').textContent = data.length;
   document.getElementById('metric-upcoming').textContent = upcoming;
-  var nextBizDay = getNextBusinessDay(TODAY_ISO);
+  var nextBizDay = getNextBusinessDay();
   var tomorrowFiles = DATA.filter(function(r) { return r.disbursementDateISO === nextBizDay; });
   document.getElementById('metric-next-date').textContent = tomorrowFiles.length;
   document.getElementById('metric-next-borrower').textContent = tomorrowFiles.length > 0 ? fmtDate(nextBizDay) : 'No disbursements';
 }
 
-function getNextBusinessDay(isoDate) {
-  var parts = isoDate.split('-');
-  var d = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
-  d.setDate(d.getDate() + 1);
-  while (d.getDay() === 0 || d.getDay() === 6) { d.setDate(d.getDate() + 1); }
-  var mm = String(d.getMonth()+1).padStart(2,'0');
-  var dd = String(d.getDate()).padStart(2,'0');
-  return d.getFullYear() + '-' + mm + '-' + dd;
+function setFilter(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  selectedDate = null;
+  renderAll();
+}
+
+function renderAll() {
+  var data = getFilteredData();
+  renderCalendar(data);
+  updateMetrics(data);
+  if (selectedDate) showDetail(selectedDate, data);
 }
 
 var now = new Date();
-var timeStr = now.toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit', hour12: true});
-document.getElementById('gen-time').textContent = 'Last viewed: ' + timeStr;
+document.getElementById('gen-time').textContent = 'Last viewed: ' + now.toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit', hour12: true});
 
 renderAll();
 </script>
