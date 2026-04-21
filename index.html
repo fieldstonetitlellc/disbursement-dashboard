@@ -984,45 +984,45 @@
       <div class="metric drillable" onclick="openDrill('incoming')">
         <div class="metric-label">Incoming Orders <span class="metric-when">yesterday</span></div>
         <div class="metric-value">
-          <span id="mIncoming">8</span>
-          <span class="metric-delta pos">+3</span>
+          <span id="mIncoming">—</span>
+          <span class="metric-delta" id="mIncomingDelta">—</span>
           <span class="drill-hint">view files ↗</span>
         </div>
-        <div class="metric-delta-label" id="mIncomingCompare">vs. Friday (5)</div>
+        <div class="metric-delta-label" id="mIncomingCompare">—</div>
       </div>
       <div class="metric drillable" onclick="openDrill('closings')">
         <div class="metric-label">Closings <span class="metric-when">yesterday</span></div>
         <div class="metric-value">
-          <span>2</span>
-          <span class="metric-delta neg">−1</span>
+          <span id="mClosings">—</span>
+          <span class="metric-delta" id="mClosingsDelta">—</span>
           <span class="drill-hint">view files ↗</span>
         </div>
-        <div class="metric-delta-label" id="mClosingsCompare">vs. Friday (3)</div>
+        <div class="metric-delta-label" id="mClosingsCompare">—</div>
       </div>
       <div class="metric">
         <div class="metric-label">Titles Cleared <span class="metric-when">yesterday</span></div>
         <div class="metric-value">
-          <span>4</span>
-          <span class="metric-delta pos">+1</span>
+          <span id="mCleared">—</span>
+          <span class="metric-delta" id="mClearedDelta">—</span>
         </div>
-        <div class="metric-delta-label" id="mClearedCompare">vs. Friday (3)</div>
+        <div class="metric-delta-label" id="mClearedCompare">—</div>
       </div>
       <div class="metric drillable" onclick="openDrill('overdue')">
         <div class="metric-label">Overdue Clearances <span class="metric-when">as of now</span></div>
         <div class="metric-value">
-          <span>0</span>
-          <span class="metric-delta flat">—</span>
+          <span id="mOverdue">—</span>
+          <span class="metric-delta" id="mOverdueDelta">—</span>
           <span class="drill-hint">view files ↗</span>
         </div>
-        <div class="metric-delta-label">healthy</div>
+        <div class="metric-delta-label" id="mOverdueLabel">—</div>
       </div>
       <div class="metric">
         <div class="metric-label">Total Open Pipeline <span class="metric-when">as of now</span></div>
         <div class="metric-value">
-          <span>169</span>
-          <span class="metric-delta pos">+5</span>
+          <span id="mPipeline">—</span>
+          <span class="metric-delta" id="mPipelineDelta">—</span>
         </div>
-        <div class="metric-delta-label">$47.8M loan volume</div>
+        <div class="metric-delta-label" id="mPipelineLabel">—</div>
       </div>
     </div>
 
@@ -1648,17 +1648,60 @@ document.querySelectorAll('.cal-nav button').forEach(btn => {
     d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
 })();
 
-// Metric comparison labels — dynamic weekday names
+// Metric tiles — populate from DATA.metrics
 (function() {
   const m = DATA.metrics;
   const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+  const setText = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  const setDelta = (id, delta) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (delta === null || delta === undefined || delta === 0) {
+      el.textContent = '—';
+      el.className = 'metric-delta flat';
+    } else if (delta > 0) {
+      el.textContent = '+' + delta;
+      el.className = 'metric-delta pos';
+    } else {
+      el.textContent = '−' + Math.abs(delta);
+      el.className = 'metric-delta neg';
+    }
+  };
   const setCompare = (id, cmp, cmpLabel) => {
     const el = document.getElementById(id);
     if (el) el.textContent = `vs. ${cap(cmpLabel)} (${cmp})`;
   };
-  setCompare('mIncomingCompare',  m.incoming_yesterday_compare, m.incoming_yesterday_compare_label);
-  setCompare('mClosingsCompare',  m.closings_yesterday_compare, m.closings_yesterday_compare_label);
-  setCompare('mClearedCompare',   m.titles_cleared_yesterday_compare, m.titles_cleared_yesterday_compare_label);
+
+  // Incoming Orders
+  setText('mIncoming', m.incoming_yesterday);
+  setDelta('mIncomingDelta', m.incoming_yesterday - m.incoming_yesterday_compare);
+  setCompare('mIncomingCompare', m.incoming_yesterday_compare, m.incoming_yesterday_compare_label);
+
+  // Closings
+  setText('mClosings', m.closings_yesterday);
+  setDelta('mClosingsDelta', m.closings_yesterday - m.closings_yesterday_compare);
+  setCompare('mClosingsCompare', m.closings_yesterday_compare, m.closings_yesterday_compare_label);
+
+  // Titles Cleared
+  setText('mCleared', m.titles_cleared_yesterday);
+  setDelta('mClearedDelta', m.titles_cleared_yesterday - m.titles_cleared_yesterday_compare);
+  setCompare('mClearedCompare', m.titles_cleared_yesterday_compare, m.titles_cleared_yesterday_compare_label);
+
+  // Overdue Clearances
+  setText('mOverdue', m.overdue_clearances);
+  setDelta('mOverdueDelta', m.overdue_clearances_delta || 0);
+  setText('mOverdueLabel', m.overdue_clearances === 0 ? 'healthy' :
+    (m.overdue_clearances === 1 ? '1 file needs attention' : `${m.overdue_clearances} files need attention`));
+
+  // Total Open Pipeline
+  setText('mPipeline', m.total_open_pipeline);
+  setDelta('mPipelineDelta', m.total_open_pipeline_delta || 0);
+  const vol = m.total_loan_volume;
+  const volFmt = vol >= 1e9 ? '$' + (vol/1e9).toFixed(1) + 'B loan volume'
+                : vol >= 1e6 ? '$' + (vol/1e6).toFixed(1) + 'M loan volume'
+                : vol >= 1e3 ? '$' + (vol/1e3).toFixed(0) + 'K loan volume'
+                : '$' + vol.toFixed(0) + ' loan volume';
+  setText('mPipelineLabel', volFmt);
 })();
 
 
