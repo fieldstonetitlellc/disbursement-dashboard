@@ -961,8 +961,8 @@
       <div class="brand-sub">Daily Operations Dashboard</div>
     </div>
     <div class="datestamp">
-      <span class="day" id="hdrDate">Tuesday, April 21</span>
-      <div class="meta"><span class="live-dot"></span>Updated 09:00 EST · Snapshot 2026-04-21</div>
+      <span class="day" id="hdrDate">—</span>
+      <div class="meta"><span class="live-dot"></span>Updated 09:00 EST · Snapshot of previous business day</div>
     </div>
   </div>
   <nav class="tabs" role="tablist">
@@ -1641,7 +1641,7 @@ document.querySelectorAll('.cal-nav button').forEach(btn => {
   });
 });
 
-// Header date
+// Header date and metadata
 (function() {
   const d = new Date(DATA.today + 'T00:00:00');
   document.getElementById('hdrDate').textContent =
